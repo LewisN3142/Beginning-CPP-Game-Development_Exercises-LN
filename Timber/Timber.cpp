@@ -1,7 +1,7 @@
 // Timber.cpp 
 
 #include <iostream>
-#include <SFML/Graphics.h>
+#include <../../SFML/Graphics.hpp>
 
 // John Horton recommends using namespace. I personally take Cherno's perspective and avoid namespace where I can. It is useful to know exactly where functions I call are coming from. If one uses namespace sf, then one may remove sf:: where :: is the scope resolution operator, from the script.
 // using namespace sf; 
