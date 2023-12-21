@@ -6,7 +6,17 @@
 #include <SFML/Graphics.hpp>
 
 // John Horton recommends using namespace. I personally take Cherno's perspective and avoid namespace where I can. It is useful to know exactly where functions I call are coming from. If one uses namespace sf, then one may remove sf:: where :: is the scope resolution operator, from the script.
-// using namespace sf; 
+// using namespace sf; #
+
+// Function declaration for...
+void updateBranches(int seed);
+
+const int NUM_BRANCHES = 6; // There will be 6 levels of branches
+sf::Sprite branches[NUM_BRANCHES]; // A C-style array of 6 branch sprites
+enum class side {NONE, LEFT, RIGHT}; // An enum class of type side containing possible locations for each branch (left/right of tree and not present) or the player
+// NONE is first as default state for tree.
+side branchPositions[NUM_BRANCHES]; // An array of side objects, one for each branch
+
 
 // Main function from which execution starts
 int main()
@@ -72,7 +82,7 @@ int main()
 	timeBar.setPosition((1920 / 2) - timeBarStartWidth / 2, 980);
 
 	// Make a new time object
-	sf::Time gameTimeTotal;
+	sf::Time gameTimeTotal; // What is this for?
 
 	// The player begins with 6 seconds on the clock - we divide the bar into sixths accordingly
 	float timeRemaining = 6.0f;
@@ -109,6 +119,17 @@ int main()
 	messageText.setPosition(1920 / 2.0f, 1080 / 2.0f); // Place centre of messageText at centre of screen
 	scoreText.setPosition(20, 20);
 
+	// Set Up Branches
+	sf::Texture textureBranch;
+	textureBranch.loadFromFile("graphics/branch.png");
+	
+	for (int i = 0; i < NUM_BRANCHES; i++)
+	{
+		branches[i].setTexture(textureBranch);
+		branches[i].setPosition(-500, -500);
+		branches[i].setOrigin(220, 20); // Branch origin is centre of branch
+	}
+
 	/*
 	**********************************
 	Game Loop
@@ -132,9 +153,10 @@ int main()
 		{
 			isGamePaused = false;
 
-			// Reset game timer and score
+			// Reset game timers and score
 			score = 0;
 			timeRemaining = 6;
+			engineClock.restart(); // As cloud and bee movement tied to engine clock, need to reset to prevent teleporting when game restarts (due to frame time)
 		}
 
 		/* 
@@ -245,6 +267,29 @@ int main()
 			std::stringstream ss;
 			ss << "Score = " << score; // Concatenate the word 'score' with the integer score using a stringstream object
 			scoreText.setString(ss.str()); // Cast the stringstream object to a string and set the scoreText to this value
+
+			// Set Branch Position Based On Height
+			for (int i = 0; i < NUM_BRANCHES; i++) 
+			{
+				float height = i * 150;
+				
+				if (branchPositions[i] == side::LEFT) // Might be better to use switch here with branchPositions[i] as the expression and side::... as the case
+				{
+					branches[i].setPosition(610, height); // Fix sprite height
+					branches[i].setRotation(180); // Flip sprite
+				}
+				else if (branchPositions[i] == side::RIGHT)
+				{
+					branches[i].setPosition(1330, height);
+					branches[i].setRotation(0); // Necessary if branch changes side after falling off screen
+				}
+				else
+				{
+					// Hide branches not in use (side NONE)
+					branches[i].setPosition(-500, height);
+				}
+			}
+
 		}
 		/*
 		*******************************************
@@ -259,6 +304,12 @@ int main()
 		window.draw(spriteCloud1);
 		window.draw(spriteCloud2);
 		window.draw(spriteCloud3);
+
+		for (int i = 0; i < NUM_BRANCHES; i++)
+		{
+			window.draw(branches[i]);
+		}
+
 		window.draw(spriteTree);
 		window.draw(spriteBee);
 
@@ -277,5 +328,37 @@ int main()
 	}
 
 	return 0;
+}
+
+// Function controlling the branches
+void updateBranches(int seed)
+{
+	// We want to move all of the branches down one place
+	// Note branch 0 is at the top of the screen and 5 is at the bottom (there are 6 branches indexed from 0)
+	// To simulate branches falling, we want to set branch j to be on the side (position) branch j-1 was on, for all 0<j=<5 
+
+	for (int j = NUM_BRANCHES - 1; j > 0; j--)
+	{
+		branchPositions[j] = branchPositions[j - 1];
+	}
+
+	// Branch 0 should take a random position to simulate a new branch being added
+	// We then want to animate a branch falling to replace branch 5.
+
+	srand((int)time(0) + seed);
+	int r = (rand() % 5); // 5 here makes branch only spawn 40% of time
+
+	switch (r) {
+	case 0:
+		branchPositions[0] = side::LEFT;
+		break;
+	case 1:
+		branchPositions[0] = side::RIGHT;
+		break;
+	default:
+		branchPositions[0] = side::NONE;
+		break;
+	}
+
 }
 
