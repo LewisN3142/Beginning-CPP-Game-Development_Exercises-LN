@@ -5,7 +5,7 @@
 #include <SFML/Audio.hpp>
 
 // John Horton recommends using namespace. I personally take Cherno's perspective and avoid namespace where I can. It is useful to know exactly where functions I call are coming from. If one uses namespace sf, then one may remove sf:: where :: is the scope resolution operator, from the script.
-// using namespace sf; #
+// using namespace sf; 
 
 // Function declaration for...
 void updateBranches(int seed);
@@ -217,7 +217,7 @@ int main()
 			// Reset game timers and score
 			score = 0;
 			timeRemaining = 6;
-			// engineClock.restart(); // As cloud and bee movement tied to engine clock, need to reset to prevent teleporting when game restarts (due to frame time)
+			engineClock.restart(); // As cloud and bee movement tied to engine clock, need to reset to prevent teleporting when game restarts (due to frame time)
 
 			// Reset all but top branch to not present
 			for (int i = 1; i < NUM_BRANCHES; i++)
