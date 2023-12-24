@@ -1,9 +1,8 @@
 // Note to self -- change from dynamic to static implementation of sfml when application complete.
 
-#include <string>
-#include <iostream>
 #include <sstream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 // John Horton recommends using namespace. I personally take Cherno's perspective and avoid namespace where I can. It is useful to know exactly where functions I call are coming from. If one uses namespace sf, then one may remove sf:: where :: is the scope resolution operator, from the script.
 // using namespace sf; #
@@ -13,7 +12,7 @@ void updateBranches(int seed);
 
 const int NUM_BRANCHES = 6; // There will be 6 levels of branches
 sf::Sprite branches[NUM_BRANCHES]; // A C-style array of 6 branch sprites
-enum class side {NONE, LEFT, RIGHT}; // An enum class of type side containing possible locations for each branch (left/right of tree and not present) or the player
+enum class side {LEFT, RIGHT, NONE}; // An enum class of type side containing possible locations for each branch (left/right of tree and not present) or the player
 // NONE is first as default state for tree.
 side branchPositions[NUM_BRANCHES]; // An array of side objects, one for each branch
 
@@ -130,6 +129,56 @@ int main()
 		branches[i].setOrigin(220, 20); // Branch origin is centre of branch
 	}
 
+	// Set Up Player
+	sf::Texture texturePlayer;
+	texturePlayer.loadFromFile("graphics/player.png");
+	sf::Sprite spritePlayer(texturePlayer);
+	spritePlayer.setPosition(580, 720);
+	side playerSide = side::LEFT; 
+
+	// Set Up Gravestone
+	sf::Texture textureRip;
+	textureRip.loadFromFile("graphics/rip.png");
+	sf::Sprite spriteRip(textureRip);
+	spriteRip.setPosition(600, 860);
+
+	// Set Up Axe
+	sf::Texture textureAxe;
+	textureAxe.loadFromFile("graphics/axe.png");
+	sf::Sprite spriteAxe(textureAxe);
+	spriteAxe.setPosition(700, 830);
+
+	// Line up horizontal position of axe with tree
+	const float AXE_POSITION_LEFT = 700;
+	const float AXE_POSITION_RIGHT = 1075;
+
+	// Set Up Log
+	sf::Texture textureLog;
+	textureLog.loadFromFile("graphics/log.png");
+	sf::Sprite spriteLog(textureLog);
+	spriteLog.setPosition(810, 720);
+
+	// Variables for log
+	bool isLogMoving = false;
+	float logSpeedX = 0;
+	float logSpeedY = -500;
+
+	// Check whether the player is currently pressing a key
+	bool isGameAcceptingInput = false;
+
+	// Load sounds into memory
+	sf::SoundBuffer chopBuffer;
+	chopBuffer.loadFromFile("sound/chop.wav");
+	sf::Sound chop(chopBuffer); // Short for Sound chop; chop.setBuffer(chopBuffer);
+
+	sf::SoundBuffer deathBuffer;
+	deathBuffer.loadFromFile("sound/death.wav");
+	sf::Sound death(deathBuffer);
+
+	sf::SoundBuffer ootBuffer;
+	ootBuffer.loadFromFile("sound/out_of_time.wav");
+	sf::Sound outOfTime(ootBuffer);
+
 	/*
 	**********************************
 	Game Loop
@@ -142,6 +191,18 @@ int main()
 		Input Handler 
 		*******************************************
 		*/
+
+		// Check whether or not a key has been released
+		sf::Event event;
+
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::KeyReleased && !isGamePaused) // Probably worth checking what key was released? Else the player could alternate?
+			{
+				isGameAcceptingInput = true;
+				spriteAxe.setPosition(2000, spriteAxe.getPosition().y); // Hide axe and allow new player input
+			}
+		}
 
 		// Close the window when the escape key is pressed
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -156,7 +217,72 @@ int main()
 			// Reset game timers and score
 			score = 0;
 			timeRemaining = 6;
-			engineClock.restart(); // As cloud and bee movement tied to engine clock, need to reset to prevent teleporting when game restarts (due to frame time)
+			// engineClock.restart(); // As cloud and bee movement tied to engine clock, need to reset to prevent teleporting when game restarts (due to frame time)
+
+			// Reset all but top branch to not present
+			for (int i = 1; i < NUM_BRANCHES; i++)
+			{
+				branchPositions[i] = side::NONE;
+			}
+
+			// Hide Gravestone
+			spriteRip.setPosition(675, 1500);
+
+			// Reset log
+			spriteLog.setPosition(810, 720);
+
+			// Put player on left side of tree
+			spritePlayer.setPosition(580, 720);
+
+			// Hide axe
+			spriteAxe.setPosition(2000, spriteAxe.getPosition().y);
+
+			// Will want to flip the sprite using below but need to set origin to centre of sprite first
+			// spritePlayer.scale(-1.0f, 1.0f);
+
+			isGameAcceptingInput = true;
+		}
+
+		if (isGameAcceptingInput)
+		{
+			// Could make the content of these if blocks a function taking side as an argument?
+			// Move player to right side of tree and chop (may need to edit to flip sprite etc)
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				playerSide = side::RIGHT;
+				score++; 
+				timeRemaining += (2 / score) + 0.15; // Add extra time based on score (increased difficulty near end)
+				spriteAxe.setPosition(AXE_POSITION_RIGHT,spriteAxe.getPosition().y);
+				spritePlayer.setPosition(1200, 720);
+
+				updateBranches(score); // Use score to seed the next branch
+
+				spriteLog.setPosition(810, 720); // Put log at base of tree
+				logSpeedX = -4000;
+				isLogMoving = true;
+
+				isGameAcceptingInput = false;
+				chop.play();
+			}
+
+			// Move player to left side of tree and chop
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				playerSide = side::LEFT;
+				score++;
+				timeRemaining += (2 / score) + 0.15;
+				spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
+				spritePlayer.setPosition(580, 720);
+
+				updateBranches(score);
+				
+				spriteLog.setPosition(810, 720);
+				logSpeedX = 4000;
+				isLogMoving = true;
+				
+				isGameAcceptingInput = false;
+				chop.play();
+			}
 		}
 
 		/* 
@@ -181,6 +307,7 @@ int main()
 				messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 
 				messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+				outOfTime.play();
 			}
 
 			// Update bee movement (start movement if bee not moving)
@@ -290,6 +417,36 @@ int main()
 				}
 			}
 
+			// Move chopped log
+			if (isLogMoving)
+			{
+				spriteLog.setPosition(spriteLog.getPosition().x + (logSpeedX * deltaTime.asSeconds()), spriteLog.getPosition().y + (logSpeedY * deltaTime.asSeconds()));
+
+				// Check if the log has gone off screen
+				if (spriteLog.getPosition().x < -100 || spriteLog.getPosition().x >2000)
+				{
+					isLogMoving = false; // Reset log for next chop (may be issue as what if new log needed before last one leaves screen? Log teleports?)
+					logSpeedX = 0;
+					spriteLog.setPosition(810, 720); 
+				}
+			}
+
+			// Check if player squashed (check if branch at lowest level is on same side as player)
+			if (branchPositions[5] == playerSide)
+			{
+				isGamePaused = true;
+				isGameAcceptingInput = false;
+
+				spriteRip.setPosition(525, 760);
+				spritePlayer.setPosition(2000, 660);
+				spriteAxe.setPosition(2000, spriteAxe.getPosition().y); // Line added as axe left floating in tree near lumberjack otherwise
+
+				messageText.setString("SQUISHED! \n\Press Enter to play again!");
+				sf::FloatRect textRect = messageText.getLocalBounds();
+				messageText.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f); // Turn these blocks into a function to set origin to center of sprite
+				messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+				death.play();
+			}
 		}
 		/*
 		*******************************************
@@ -321,8 +478,13 @@ int main()
 			window.draw(messageText);
 		}
 
+		window.draw(spritePlayer);
+		window.draw(spriteAxe);
+		window.draw(spriteLog);
+		window.draw(spriteRip);
 
-		// Draw new frame
+
+		// Display new frame
 		window.display(); // Display new frame
 
 	}
