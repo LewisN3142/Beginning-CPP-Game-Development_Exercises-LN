@@ -57,3 +57,20 @@ Game elements to add in the refinement branch:
 One refinement I have already made within the main branch while I was working through the book's recommended code was to make the bee's motion a little less mundane (the book simply translates the bee horizontally across the screen from right to left). Instead of this, I modified the ``y`` position of the bee by some Fourier modes (sine functions) dependent on the current ``x`` position of the bee, resulting in sinusoidal motion across the screen. I used one low amplitude, low frequency mode (``sin(x/250)/150``) and one high frequency, high amplitude mode (``sin(x/100)/60``) to add some variation. 
 
 I also added a line of code (line 220) which restarts the ``sf::Clock engineClock`` as otherwise the bee and clouds teleport when the game is restarted after a loss, instead of continuing on their previous path. This is due to the fact that the clouds and bee are moved on each unpaused frame and their movement depends on the ``sf::Time deltaTime`` since the last frame on which they moved. If the clock is not reset when the game is restarted, the deltaTime includes the of time that has passed since the previous game ended and the game was paused, hence the sprites can move a very long distance. This extra line of code makes it so that the clouds and bee move a distance which depends only on the deltaTime since the last unpaused frame.
+
+
+## Project 2 - Pong
+The second project in this series is based on the classic 1972 game Pong, in particular Pong-Squash, a mid-1970s variant of pong where a single player hits a ball against the far wall of the play area. See this [youtube video](https://youtu.be/u9rNMVTN-uc?si=SLkuiy0SkmkPaGRJ) by James Channel for more information on the early Pong Home Consoles, based on the General Electric IC, on which Pong-Squash appeared.
+
+The main elements of games programming that were addressed in this project are:
+...
+
+The main components of games design that were addressed in this project are:
+...
+
+This game project was a brief introduction to the notion of object oriented programming (a concept that I had already come across from a brief period learning Java back in secondary school), covering classes, member variables, and encapsulation. This project was also pretty straightforward, though the process of setting up visual studio community on a per-project basis is a little tedious and prone to errors (in particular, remembering to set the C++ version to that compatible with the included version of SFML). I am considering writing a cmd/bash application to do this for me, taking a ``.vcxproj`` file and SFML file path as input and editing the ``.vcxproj`` file accordingly. If I do so, I will make the file available for public use on my account here. 
+
+I note a couple of bugs within the original code also...
+
+While working on this project, I had a couple of ideas for additional features, some being more stereotypical Pong 
+
