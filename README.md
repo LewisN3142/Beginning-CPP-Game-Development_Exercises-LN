@@ -63,14 +63,38 @@ I also added a line of code (line 220) which restarts the ``sf::Clock engineCloc
 The second project in this series is based on the classic 1972 game Pong, in particular Pong-Squash, a mid-1970s variant of pong where a single player hits a ball against the far wall of the play area. See this [youtube video](https://youtu.be/u9rNMVTN-uc?si=SLkuiy0SkmkPaGRJ) by James Channel for more information on the early Pong Home Consoles, based on the General Electric IC, on which Pong-Squash appeared.
 
 The main elements of games programming that were addressed in this project are:
-...
+- Object oriented design (objects as instances of classes, encapsulation).
+- Spawning objects of a class.
+- Using member variables and methods to interact with game objects and take user input.
+- Collision between game objects and between a game object and the boundary of the playable area (using intersections and object bounds).
 
 The main components of games design that were addressed in this project are:
-...
+ - Animating sprites (displaying, hiding, moving).
+ - Timers and clocks.
+ - Scoring and UI.
 
 This game project was a brief introduction to the notion of object oriented programming (a concept that I had already come across from a brief period learning Java back in secondary school), covering classes, member variables, and encapsulation. This project was also pretty straightforward, though the process of setting up visual studio community on a per-project basis is a little tedious and prone to errors (in particular, remembering to set the C++ version to that compatible with the included version of SFML). I am considering writing a cmd/bash application to do this for me, taking a ``.vcxproj`` file and SFML file path as input and editing the ``.vcxproj`` file accordingly. If I do so, I will make the file available for public use on my account here. 
 
-I note a couple of bugs within the original code also...
+While working on this project, I became aware of a number of bugs in the original code, all consequences of the fairly simplistic collision that was put in place, which I would like to address in the refinements version:
+ - Firstly, it is possible for the ball to bounce off one of the side walls at an angle close to 90 degrees. Should this occur, it is then possible for the ball to collide with the side of the paddle &ndash; as the code that runs when the bat and ball intersect does not check which part of the bat the ball hits and simply reverses the ``y`` velocity of the ball, it is then possible for the ball to get stuck in the paddle for a time, oscillating up and down until it falls out the other side or otherwise escapes. This could be resolved by writing some custom collision to check which part of the bat was hit by the ball, rather than using the ``intersects()`` method of the ``sf::Sprite`` class along with the ``getPosition()`` methods of ``Bat`` and ``Ball`` to get their local bounds.
+ - Secondly, the player score always increases by 1 when the ball goes out of play, off the bottom of the screen. This is due to the reset position of the ball being above the play area and the ball therefore crossing the upper boundary as it returns into play; the upper boundary of the screen has collision in place (namely the ``if(ball.getPosition().top<0)`` block beginning on line ``93``) which increases the score when the ball hits it. This could be resolved either by setting the ball to reset to the middle of the screen, or checking the direction of the ball when it hits the upper boundary.
 
-While working on this project, I had a couple of ideas for additional features, some being more stereotypical Pong 
+While working on this project, I had a couple of ideas for additional features, some being more stereotypical Pong features and others being more involved. These include:
+ - FPS counter
+ - Change speed of the ball on each hit
+ - Instantiate the ball with some random angle each time otherwise the first hit is always the same
+ - Add sound effects
+ - Add a pause menu and game reset button
+ - Difficulty settings so the player may change the game speed and paddle size
+ - Different game modes including the more standard 2-player pong
+ - Basic AI for the second player
+ - Add a trail behind the ball as well as a center line and visible wall
+ - A game mode that has different shot-types, such as spin or smash
+ - Noita-like particle physics for the paddles
+
+It is worth discussing the last point a little, since I think a game of particle physics pong would be quite interesting. The player could build up a meter that allows them to do a series of increasingly outlandish abilities including making the ball spin, creating a wooden blockade on the court, setting fire to blockades or paddles on hit, and lastly passing through other particles. In order to set this up, however, I would need to be more familiar with the cellular automata used to create Noita's particle systems, so this may well spawn a parallel project where I investigate how this is done.
+
+
+
+
 
