@@ -107,6 +107,7 @@ int main()
 		}
 
 		// Issue with collision - if ball collides with the side of the paddle, it gets briefly stuck in the paddle and then falls through it
+		// Second issue with collision - score is added to as if the player collided with the top when the ball is reset
 
 		// Draw new frame
 		window.clear();
