@@ -5,10 +5,13 @@ This repository will contain the exercises from this book and will be updated as
 A brief overview of my thought process during each project can be found below in markdown format and will eventually make their way to my personal website in PDF form, potentially with further elaboration.
 
 For the most part, the main branch of this repository will contain the code I produced while following the formal 'solutions' to these exercises, however they may have slight deviations where I come up with ideas 'in medias res' as it were. 
-A second repository entitled 'refinements' contains cleaned up versions of the code modified in accordance with proposed extensions from the book, as well as features/bug fixes I may produce myself.
+A second repository entitled 'refinements' will contain cleaned up versions of the code modified in accordance with proposed extensions from the book, as well as features/bug fixes I may produce myself.
 Should you want to view the clean, intended solutions, they are available on the [official Packt repository](https://github.com/PacktPublishing/Beginning-Cpp-Game-Programming-Second-Edition). 
 
 Note that while I work on these projects, they will utilise dynamic SFML, so if you wish to compile the code locally, you will need to [download SFML](https://www.sfml-dev.org/download/sfml/2.6.1/). Once you have extracted the files from the .zip folder, copy and paste the contents of the folder 'SFML-2.6.1' into a new folder called 'SFML' located at the root of the project directory (in the same folder as the readme/gitignore files). Once I have completed the projects, I hope to update to static SFML so that this step is not necessary, but I will update the readme when/if this happens. Also note that the version of SFML I link to is for Visual C++17, so if you are working in Visual Studio Community, make sure that your standard is set to this if you come across any errors (VS 2019/22 Community unfortunately default to C++14 and not the newer standards). You should now be able to open the .sln files for each of the respective projects (i.e. Pong, Timber, etc) in Visual Studio Community and run the C++ code from there. Note that the build options you will need are 'Win32' (or x86) and 'Debug.' The linker and C++ compiler should be set up appropriately by default due to the .vcxproj file included in this repository, however if Visual Studio Community fails to read this for any reason, you may need to do this manually. I recommend following John Horton's book for this; see the chapter 'Setting up SFML.'  
+
+If you simply wish to run the executable file for a given project (e.g. Pong or Timber), you will need to clone/download the executable, the sfml-...-2.dll, and the sfml-...-d-2.dll files from the project folder.
+Note that the .dll and .exe files must be in the same folder and not separated into sub-folders. You can then simply run the executable to play the game.
 
 
 ## Project 1 - Timber!
