@@ -15,6 +15,9 @@ Note that the executable files contained in the project folders (e.g. Pong.exe) 
 If you simply wish to run the executable file for a given project (e.g. Pong or Timber), instead of viewing or editing the source, you will need to clone/download the executable, the ``sfml-...-2.dll``, and the ``sfml-...-d-2.dll`` files from the project folder.
 The .dll and .exe files must be in the same folder and not separated into sub-folders. You can then simply run the executable to play the game. 
 
+[![Conway's Game of Life on the Plane](https://img.youtube.com/vi/f2vLxhv_Swc/0.jpg)](https://www.youtube.com/watch?v=f2vLxhv_Swc)
+
+Click the image to view a demo of the game Timber (opens Youtube in the current window). Note that while the demo has no sound, the game itself does.
 
 ## Project 1 - Timber!
 For the first project in this series, we create a clone of the game Timberman, where the player is tasked with chopping down a tree, while avoiding the branches falling on them from above.
